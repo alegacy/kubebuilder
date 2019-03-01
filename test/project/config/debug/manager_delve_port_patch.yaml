@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: controller-manager
+  namespace: system
+spec:
+  template:
+    spec:
+      containers:
+        - name: manager
+          ports:
+            # Expose the Delve Debugger port
+            - containerPort: 30000
+              name: delve-debugger
+              protocol: TCP
+          command:
+          - /dlv
+          args:
+            - "--listen=:30000"
+            - "--headless=true"
+            - "--api-version=2"
+            - "--accept-multiclient"
+            - "exec"
+            - "/manager"
+            - "--"
+            - "--metrics-addr=127.0.0.1:8080"
+          resources:
+            limits:
+              cpu: 100m
+              memory: 300Mi
+            requests:
+              cpu: 100m
+              memory: 200Mi

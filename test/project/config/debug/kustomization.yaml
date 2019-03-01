@@ -1,0 +1,11 @@
+namespace: project-system
+
+bases:
+  - ../default
+
+patches:
+  - manager_image_patch.yaml
+  - manager_delve_port_patch.yaml
+
+resources:
+  - manager_delve_debug_service.yaml
