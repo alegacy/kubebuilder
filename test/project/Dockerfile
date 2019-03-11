@@ -1,16 +1,18 @@
-# Build the manager binary
-FROM golang:1.10.3 as builder
-ARG GOBUILD_GCFLAGS=""
-
-# Copy in the go src
-WORKDIR /go/src/sigs.k8s.io/kubebuilder/test/project
-COPY pkg/    pkg/
-COPY cmd/    cmd/
-COPY vendor/ vendor/
+FROM golang:1.10.3 as dlvbuilder
 
 # Build delve debugger
 RUN apt-get update && apt-get install -y git
 RUN go get github.com/derekparker/delve/cmd/dlv
+
+FROM dlvbuilder as builder
+ARG GOBUILD_GCFLAGS=""
+
+# Copy in the go src
+WORKDIR /go/src/sigs.k8s.io/kubebuilder/test/project
+
+COPY pkg/    pkg/
+COPY cmd/    cmd/
+COPY vendor/ vendor/
 
 # Build manager
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -gcflags "${GOBUILD_GCFLAGS}" -a -o manager sigs.k8s.io/kubebuilder/test/project/cmd/manager
@@ -25,6 +27,6 @@ CMD "/manager"
 # Copy the delve debugger into a debug image
 FROM production as debug
 WORKDIR /
-COPY --from=builder /go/bin/dlv /
+COPY --from=dlvbuilder /go/bin/dlv /
 
 CMD ["/dlv", "--listen=:30000", "--headless=true", "--api-version=2", "--accept-multiclient", "exec", "/manager"]
