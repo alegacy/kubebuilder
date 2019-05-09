@@ -14,13 +14,8 @@ spec:
               name: delve-debugger
               protocol: TCP
           command:
-          - /dlv
+            - /dlv-wrapper.sh
           args:
-            - "--listen=:30000"
-            - "--headless=true"
-            - "--api-version=2"
-            - "--accept-multiclient"
-            - "exec"
             - "/manager"
             - "--"
             - "--metrics-addr=127.0.0.1:8080"

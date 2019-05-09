@@ -29,4 +29,4 @@ FROM production as debug
 WORKDIR /
 COPY --from=dlvbuilder /go/bin/dlv /
 
-CMD ["/dlv", "--listen=:30000", "--headless=true", "--api-version=2", "--accept-multiclient", "exec", "/manager"]
+CMD ["/dlv-wrapper.sh", "/manager"]
